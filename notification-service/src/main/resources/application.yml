@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: notification-service
+  main:
+    allow-bean-definition-overriding: true
+    allow-circular-references: true
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: http://localhost:8088/auth/realms/erp-dev
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5434/notification-db
+    username: abbes
+    password: abbes
+  jpa:
+    hibernate:
+      ddl-auto: update
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: abbemeiouna@gmail.com
+    password: wmxp tqqp ypni gzbi
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: notificationId
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+#        spring.json.trusted.packages: "dz.kyrios.adminservice.entity.User"
+        spring.json.type.mapping: userCreatedEvent:dz.kyrios.notificationservice.entity.User,notificationEvent:dz.kyrios.notificationservice.event.notification.NotificationPayload,notificationPlaceHolder:dz.kyrios.notificationservice.event.notification.PlaceHolder
+server:
+  port: 0
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka:password@localhost:8761/eureka
+
+permission-service:
+  uri: http://localhost:8080/admin-service/api/v1/permission
+  authority-param-name: authority
+  module-param-name: module
+  module-name: notification-service
