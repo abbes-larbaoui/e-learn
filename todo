@@ -1,2 +1,2 @@
-1. TODO: add enable/disable for all services.
-2. TODO: upgrade to spring boot 3.
+1. TODO: add admin init user
+2. TODO: add authorities inti for admin module
