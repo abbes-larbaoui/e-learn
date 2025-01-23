@@ -14,7 +14,11 @@ public class Teacher {
 
     private String name;
 
+    private String bio;
+
     private List<SubscriptionPlan> subscriptionPlans;
+
+    private List<Subject> subjects;
 
     private GeneralStatus status;
 }

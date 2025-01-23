@@ -1,5 +1,5 @@
 package dz.kyrios.core.statics;
 
-public enum UserType {
+public enum ProfileType {
     ADMIN, TEACHER, STUDENT
 }

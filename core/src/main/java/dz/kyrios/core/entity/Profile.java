@@ -1,6 +1,6 @@
 package dz.kyrios.core.entity;
 
-import dz.kyrios.core.statics.UserType;
+import dz.kyrios.core.statics.ProfileType;
 import lombok.Data;
 
 @Data
@@ -12,5 +12,5 @@ public class Profile {
 
     private String userUuid;
 
-    private UserType userType;
+    private ProfileType profileType;
 }
