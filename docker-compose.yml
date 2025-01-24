@@ -61,6 +61,18 @@ services:
       POSTGRES_PASSWORD: abbes
     volumes:
       - notification-db-data:/var/lib/postgresql/data
+  core-service-db:
+    image: postgres
+    container_name: core-service-db
+    restart: always
+    ports:
+      - "5435:5432"
+    environment:
+      POSTGRES_DB: core-db
+      POSTGRES_USER: abbes
+      POSTGRES_PASSWORD: abbes
+    volumes:
+      - notification-db-data:/var/lib/postgresql/data
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin4
