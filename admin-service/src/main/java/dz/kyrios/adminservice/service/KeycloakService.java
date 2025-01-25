@@ -3,6 +3,7 @@ package dz.kyrios.adminservice.service;
 import dz.kyrios.adminservice.dto.user.UserCreateRequest;
 import dz.kyrios.adminservice.dto.user.UserRequest;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
@@ -20,6 +21,7 @@ import jakarta.ws.rs.core.Response;
 import java.util.Collections;
 import java.util.List;
 
+@Slf4j
 @Transactional
 @Service
 public class KeycloakService {
@@ -47,6 +49,22 @@ public class KeycloakService {
                 .clientId(adminClientId)
                 .clientSecret(adminClientSecret)
                 .build();
+    }
+
+    @PostConstruct
+    public void fetchDefaultUserUuid() {
+        UserCreateRequest defaultUser = new UserCreateRequest();
+        defaultUser.setUserName("default_user");
+        defaultUser.setEmail("default@gmail.com");
+        defaultUser.setFirstName("default");
+        defaultUser.setLastName("user");
+        defaultUser.setActif(true);
+        defaultUser.setEmailVerified(true);
+        defaultUser.setPassword("default_password");
+        defaultUser.setTemporary(false);
+
+        String userUuid = createUser(defaultUser);
+        log.warn("THE DEFAULT USER IS CREATED: {}", userUuid);
     }
 
     public String createUser(UserCreateRequest request) {

@@ -12,6 +12,7 @@ import dz.kyrios.adminservice.dto.user.UserRequest;
 import dz.kyrios.adminservice.dto.user.UserResponse;
 import dz.kyrios.adminservice.enums.KeycloakRequiredAction;
 import dz.kyrios.adminservice.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @RestController
 public class UserController {
 
@@ -48,7 +50,7 @@ public class UserController {
     }
 
     @PostMapping("/api/v1/user/{profileTypeId}")
-    @PreAuthorize("hasAuthority('USER_CREATE')")
+//    @PreAuthorize("hasAuthority('USER_CREATE')")
     public ResponseEntity<Object> create(@RequestBody UserCreateRequest request,
                                                @PathVariable Long profileTypeId) {
         try {
@@ -57,6 +59,7 @@ public class UserController {
         } catch (NotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (RuntimeException e) {
+            log.error(e.getMessage(), e);
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -141,7 +144,7 @@ public class UserController {
     }
 
     @PostMapping("/api/v1/user/profile/add-profile/{profileTypeId}")
-    @PreAuthorize("hasAuthority('USER_PROFILE_ADD')")
+//    @PreAuthorize("hasAuthority('USER_PROFILE_ADD')")
     public ResponseEntity<Object> addProfile(@RequestBody ProfileRequest request,
                                              @PathVariable Long profileTypeId) {
         try {

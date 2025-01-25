@@ -8,7 +8,7 @@ spring:
     oauth2:
       resource-server:
         jwt:
-          issuer-uri: http://localhost:8088/auth/realms/erp-dev
+          issuer-uri: http://localhost:8088/realms/erp-dev
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/admin-db
@@ -31,6 +31,20 @@ spring:
       properties:
         spring.json.addtypeheaders: false
         spring.json.type.mapping: userCreatedEvent:dz.kyrios.adminservice.event.user.UserCreatedEvent,event:dz.kyrios.adminservice.config.auditlog.EntityTrace,notificationEvent:dz.kyrios.adminservice.event.notification.NotificationPayload,notificationPlaceHolder:dz.kyrios.adminservice.event.notification.PlaceHolder
+  flyway:
+    enabled: true
+    url: jdbc:postgresql://localhost:5432/admin-db
+    user: abbes
+    password: abbes
+    schemas: public
+    baseline-on-migrate: true
+    baseline-version: 1
+    placeholders:
+      default_user_uuid: check-keycloak-and-update-it
+      default_email: default_user@example.com
+      default_first_name: Default
+      default_last_name: User
+      default_user_name: default_user
 server:
   port: 0
 eureka:
@@ -40,6 +54,6 @@ eureka:
 
 app:
   realm: erp-dev
-  auth-server-url: http://localhost:8088/auth
+  auth-server-url: http://localhost:8088
   admin-client-id: account-service
-  admin-client-secret: koO36nzQ0igdaMpA3byMRGpma0Biuufz
+  admin-client-secret: TwLepZoiaIrM5QAPxAbpyoaImeIdjTJb

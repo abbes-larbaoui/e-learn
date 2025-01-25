@@ -1,7 +1,6 @@
 package dz.kyrios.core.config.filter.specification;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dz.kyrios.core.config.filter.specification.SearchSort;
 import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;

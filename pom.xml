@@ -17,6 +17,7 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>admin-service</module>
+        <module>core</module>
         <module>erp-discovery-server</module>
         <module>erp-api-gateway</module>
         <module>notification-service</module>

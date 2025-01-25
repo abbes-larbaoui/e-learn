@@ -6,6 +6,7 @@ volumes:
   pgadmin-data:
   audit-log-data:
   notification-db-data:
+  core-db-data:
 
 services:
   keycloak-db:
@@ -21,20 +22,18 @@ services:
     volumes:
       - keycloak-db-data:/var/lib/postgresql/data
   keycloak:
-    image: jboss/keycloak
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak
+    command: start-dev
     environment:
-      DB_VENDOR: POSTGRES
-      DB_ADDR: keycloak-db
-      DB_DATABASE: keycloak
-      DB_USER: keycloak
-      DB_SCHEMA: public
-      DB_PASSWORD: password
-      KEYCLOAK_USER: admin
-      KEYCLOAK_PASSWORD: Pa55w0rd
-      # Uncomment the line below if you want to specify JDBC parameters. The parameter below is just an example, and it shouldn't be used in production without knowledge. It is highly recommended that you read the PostgreSQL JDBC driver documentation in order to use it.
-      #JDBC_PARAMS: "ssl=true"
+      KEYCLOAK_ADMIN: admin           # Keycloak admin username
+      KEYCLOAK_ADMIN_PASSWORD: admin # Keycloak admin password
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: password
     ports:
-      - "8088:8080"
+      - 8088:8080
     depends_on:
       - keycloak-db
   admin-service-db:
@@ -72,7 +71,7 @@ services:
       POSTGRES_USER: abbes
       POSTGRES_PASSWORD: abbes
     volumes:
-      - notification-db-data:/var/lib/postgresql/data
+      - core-db-data:/var/lib/postgresql/data
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin4
