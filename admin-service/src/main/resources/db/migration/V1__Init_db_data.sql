@@ -1,6 +1,4 @@
-create database "admin-db"
-    with owner abbes;
-
+----------------------------------------------- tables -----------------------------------------------
 create table public.authority_type
 (
     id      bigserial
@@ -171,28 +169,70 @@ alter table public.profile
     add constraint fkji1141ofp15qe9v2f6l1b5wu6
         foreign key (user_id) references public.t_user;
 
-INSERT INTO public.authority_type (id, actif, libelle) VALUES (1, true, 'Field');
-INSERT INTO public.authority_type (id, actif, libelle) VALUES (2, true, 'Module');
-INSERT INTO public.authority_type (id, actif, libelle) VALUES (3, true, 'Authority');
-INSERT INTO public.authority_type (id, actif, libelle) VALUES (4, true, 'Role');
-INSERT INTO public.authority_type (id, actif, libelle) VALUES (5, true, 'User');
-INSERT INTO public.authority_type (id, actif, libelle) VALUES (6, true, 'Group');
-INSERT INTO public.authority_type (id, actif, libelle) VALUES (7, true, 'Authority Type');
+----------------------------------------------- data -----------------------------------------------
 
-INSERT INTO public.module (id, actif, color, icon, module_code, module_name, uri) VALUES (1, null, '#11009E', 'fa-solid fa-user-tie', 'ADMIN_MODULE', 'Admin Module', 'www.kyrios.dz/admin');
-
-INSERT INTO public.authority (id, actif, libelle, authority_type_id, module_id) VALUES (2, true, 'AUTHORITY_CREATE', 3, 1);
-INSERT INTO public.authority (id, actif, libelle, authority_type_id, module_id) VALUES (3, true, 'AUTHORITY_TYPE_CREATE', 7, 1);
-INSERT INTO public.authority (id, actif, libelle, authority_type_id, module_id) VALUES (4, true, 'USER_PROFILE_MODULE_ADD', 5, 1);
-INSERT INTO public.authority (id, actif, libelle, authority_type_id, module_id) VALUES (5, true, 'USER_PROFILE_ROLE_ADD', 5, 1);
-INSERT INTO public.authority (id, actif, libelle, authority_type_id, module_id) VALUES (6, true, 'USER_PROFILE_AUTHORITY_GRANT', 5, 1);
-INSERT INTO public.authority (id, actif, libelle, authority_type_id, module_id) VALUES (1, true, 'MODULE_CREATE', 2, 1);
-
-INSERT INTO public.profile (id, actif, libelle, group_id, user_id) VALUES (1, null, 'Default profile', null, 2);
+-- Disable foreign key checks
+SET session_replication_role = 'replica';
 
 
+INSERT INTO public.authority_type (actif, libelle) VALUES (true, 'Field');
+INSERT INTO public.authority_type (actif, libelle) VALUES (true, 'Module');
+INSERT INTO public.authority_type (actif, libelle) VALUES (true, 'Authority');
+INSERT INTO public.authority_type (actif, libelle) VALUES (true, 'Role');
+INSERT INTO public.authority_type (actif, libelle) VALUES (true, 'User');
+INSERT INTO public.authority_type (actif, libelle) VALUES (true, 'Group');
+INSERT INTO public.authority_type (actif, libelle) VALUES (true, 'Authority Type');
+
+INSERT INTO public.module (actif, color, icon, module_code, module_name, uri) VALUES (true, '#11009E', 'fa-solid fa-user-tie', 'ADMIN_MODULE', 'Admin Module', 'www.kyrios.dz/admin');
+
+-- Insert authorities
+INSERT INTO public.authority (actif, libelle, authority_type_id, module_id)
+SELECT true, 'MODULE_CREATE', at.id, m.id FROM public.authority_type at, public.module m WHERE at.libelle = 'Module' AND m.module_code = 'ADMIN_MODULE';
+
+INSERT INTO public.authority (actif, libelle, authority_type_id, module_id)
+SELECT true, 'AUTHORITY_CREATE', at.id, m.id FROM public.authority_type at, public.module m WHERE at.libelle = 'Authority' AND m.module_code = 'ADMIN_MODULE';
+
+INSERT INTO public.authority (actif, libelle, authority_type_id, module_id)
+SELECT true, 'AUTHORITY_TYPE_CREATE', at.id, m.id FROM public.authority_type at, public.module m WHERE at.libelle = 'Authority Type' AND m.module_code = 'ADMIN_MODULE';
+
+INSERT INTO public.authority (actif, libelle, authority_type_id, module_id)
+SELECT true, 'USER_PROFILE_MODULE_ADD', at.id, m.id FROM public.authority_type at, public.module m WHERE at.libelle = 'User' AND m.module_code = 'ADMIN_MODULE';
+
+INSERT INTO public.authority (actif, libelle, authority_type_id, module_id)
+SELECT true, 'USER_PROFILE_ROLE_ADD', at.id, m.id FROM public.authority_type at, public.module m WHERE at.libelle = 'User' AND m.module_code = 'ADMIN_MODULE';
+
+INSERT INTO public.authority (actif, libelle, authority_type_id, module_id)
+SELECT true, 'USER_PROFILE_AUTHORITY_GRANT', at.id, m.id FROM public.authority_type at, public.module m WHERE at.libelle = 'User' AND m.module_code = 'ADMIN_MODULE';
+
+-- Insert profile
+INSERT INTO public.profile (actif, libelle, group_id, user_id) VALUES (true, 'Default profile', null, 1);
+
+-- Insert default user
+INSERT INTO public.t_user (actif, email, first_name, last_name, phone_number, user_name, uuid, profile_id)
+VALUES (true, 'default_user@example.com', 'Default', 'User', '0666554433', 'default_user', 'check-keycloak-and-update-it', 1);
+
+-- Insert profile_modules
+INSERT INTO public.profile_modules (profile_id, modules_id) VALUES (1, 1);
+
+-- Insert profile authorities
+INSERT INTO public.profile_authority (granted, authority_id, profile_id)
+SELECT true, id, 1 FROM public.authority WHERE libelle = 'MODULE_CREATE';
+
+INSERT INTO public.profile_authority (granted, authority_id, profile_id)
+SELECT true, id, 1 FROM public.authority WHERE libelle = 'AUTHORITY_CREATE';
+
+INSERT INTO public.profile_authority (granted, authority_id, profile_id)
+SELECT true, id, 1 FROM public.authority WHERE libelle = 'AUTHORITY_TYPE_CREATE';
+
+INSERT INTO public.profile_authority (granted, authority_id, profile_id)
+SELECT true, id, 1 FROM public.authority WHERE libelle = 'USER_PROFILE_MODULE_ADD';
+
+INSERT INTO public.profile_authority (granted, authority_id, profile_id)
+SELECT true, id, 1 FROM public.authority WHERE libelle = 'USER_PROFILE_ROLE_ADD';
+
+INSERT INTO public.profile_authority (granted, authority_id, profile_id)
+SELECT true, id, 1 FROM public.authority WHERE libelle = 'USER_PROFILE_AUTHORITY_GRANT';
 
 
-INSERT INTO public.t_user (id, actif, email, first_name, last_name, phone_number, user_name, uuid, profile_id) VALUES (1, true, 'e-learn@gmail.com', 'E', 'Learn', null, 'e-learn', 'd66005b0-7994-44ec-b57e-692865dd2664', null);
-INSERT INTO public.t_user (id, actif, email, first_name, last_name, phone_number, user_name, uuid, profile_id) VALUES (2, true, 'abbes@gmail.com', 'Abbes', 'Larbaoui', '0659423060', 'abbes', '3502bc64-8460-4032-8d3a-842c6c8a72e5', 1);
-INSERT INTO public.t_user (id, actif, email, first_name, last_name, phone_number, user_name, uuid, profile_id) VALUES (5, true, 'default_user@example.com', 'Default', 'User', null, 'default_user', '82c4cb2b-1fca-4f7d-9836-7e6f853eef8c', null);
+-- Re-enable foreign key checks
+SET session_replication_role = 'origin';

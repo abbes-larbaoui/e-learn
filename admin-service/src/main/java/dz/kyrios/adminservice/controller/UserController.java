@@ -50,7 +50,7 @@ public class UserController {
     }
 
     @PostMapping("/api/v1/user/{profileTypeId}")
-//    @PreAuthorize("hasAuthority('USER_CREATE')")
+    @PreAuthorize("hasAuthority('USER_CREATE')")
     public ResponseEntity<Object> create(@RequestBody UserCreateRequest request,
                                                @PathVariable Long profileTypeId) {
         try {
@@ -144,7 +144,7 @@ public class UserController {
     }
 
     @PostMapping("/api/v1/user/profile/add-profile/{profileTypeId}")
-//    @PreAuthorize("hasAuthority('USER_PROFILE_ADD')")
+    @PreAuthorize("hasAuthority('USER_PROFILE_ADD')")
     public ResponseEntity<Object> addProfile(@RequestBody ProfileRequest request,
                                              @PathVariable Long profileTypeId) {
         try {
@@ -264,6 +264,7 @@ public class UserController {
         } catch (NotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (RuntimeException e) {
+            log.error(e.getMessage(), e);
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -304,7 +305,7 @@ public class UserController {
     }
 
     @GetMapping("/api/v1/user/sessions")
-//    @PreAuthorize("hasAuthority('USER_SESSION_LIST')")
+    @PreAuthorize("hasAuthority('USER_SESSION_LIST')")
     public ResponseEntity<Object> getUsersSessions(@RequestParam Integer first,
                                                    @RequestParam Integer max) {
         try {

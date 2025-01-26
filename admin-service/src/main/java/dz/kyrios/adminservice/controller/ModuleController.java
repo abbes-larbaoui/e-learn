@@ -27,7 +27,7 @@ public class ModuleController {
     }
 
     @GetMapping("/api/v1/module")
-//    @PreAuthorize("hasAuthority('MODULE_LIST')")
+    @PreAuthorize("hasAuthority('MODULE_LIST')")
     public ResponseEntity<Object> getAllFilter(@SortParam PageRequest pageRequest,
                                                @Critiria List<Clause> filter,
                                                @SearchValue ClauseOneArg searchValue) {
@@ -44,7 +44,7 @@ public class ModuleController {
     }
 
     @GetMapping("/api/v1/module/{id}")
-//    @PreAuthorize("hasAuthority('MODULE_VIEW')")
+    @PreAuthorize("hasAuthority('MODULE_VIEW')")
     public ResponseEntity<Object> getOne(@PathVariable Long id) {
         try {
             ModuleResponse response = moduleService.getOne(id);
@@ -59,7 +59,7 @@ public class ModuleController {
     }
 
     @PostMapping("/api/v1/module")
-//    @PreAuthorize("hasAuthority('MODULE_CREATE')")
+    @PreAuthorize("hasAuthority('MODULE_CREATE')")
     public ResponseEntity<Object> add(@RequestBody ModuleRequest request) {
         try {
             ModuleResponse response = moduleService.create(request);
@@ -74,7 +74,7 @@ public class ModuleController {
     }
 
     @PutMapping("/api/v1/module/{id}")
-//    @PreAuthorize("hasAuthority('MODULE_UPDATE')")
+    @PreAuthorize("hasAuthority('MODULE_UPDATE')")
     public ResponseEntity<Object> update(@RequestBody ModuleRequest request,
                                          @PathVariable Long id) {
         try {
@@ -90,7 +90,7 @@ public class ModuleController {
     }
 
     @DeleteMapping("/api/v1/module/{id}")
-//    @PreAuthorize("hasAuthority('MODULE_DELETE')")
+    @PreAuthorize("hasAuthority('MODULE_DELETE')")
     public ResponseEntity<Object> delete(@PathVariable Long id) {
         try {
             moduleService.delete(id);

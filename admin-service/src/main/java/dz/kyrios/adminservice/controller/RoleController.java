@@ -63,7 +63,7 @@ public class RoleController {
     }
 
     @GetMapping("/api/v1/role/{id}")
-//    @PreAuthorize("hasAuthority('ROLE_CREATE')")
+    @PreAuthorize("hasAuthority('ROLE_CREATE')")
     public ResponseEntity<Object> getOne(@PathVariable Long id) {
         try {
             RoleResponse response = roleService.getOne(id);

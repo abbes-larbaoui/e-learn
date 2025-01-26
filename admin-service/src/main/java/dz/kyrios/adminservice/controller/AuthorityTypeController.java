@@ -58,7 +58,7 @@ public class AuthorityTypeController {
     }
 
     @PostMapping("/api/v1/authority-type")
-//    @PreAuthorize("hasAuthority('AUTHORITY_TYPE_CREATE')")
+    @PreAuthorize("hasAuthority('AUTHORITY_TYPE_CREATE')")
     public ResponseEntity<Object> add(@RequestBody AuthorityTypeRequest request) {
         try {
             AuthorityTypeResponse response = authorityTypeService.create(request);

@@ -36,7 +36,7 @@ public class CustomJwtAuthenticationConverter {
             authoritiesFromDb = user.getActifProfile().getAuthorities()
                     .stream()
                     .filter(authority -> authority.getAuthority().getModule() != null
-                            && authority.getAuthority().getModule().getModuleCode().equals("admin-module")
+                            && authority.getAuthority().getModule().getModuleCode().equals("ADMIN_MODULE")
                             && authority.getGranted())
                     .map(authority -> new SimpleGrantedAuthority(authority.getAuthority().getLibelle()))
                     .collect(Collectors.toSet());
