@@ -13,6 +13,7 @@ import dz.kyrios.adminservice.entity.Module;
 import dz.kyrios.adminservice.enums.NotificationChannel;
 import dz.kyrios.adminservice.enums.NotificationTemplateCode;
 import dz.kyrios.adminservice.event.notification.NotificationPayload;
+import dz.kyrios.adminservice.event.user.ProfileCreatedEvent;
 import dz.kyrios.adminservice.event.user.UserCreatedEvent;
 import dz.kyrios.adminservice.mapper.user.UserMapper;
 import dz.kyrios.adminservice.mapper.usersession.UserSessionMapper;
@@ -140,8 +141,16 @@ public class UserService {
                 .firstName(createdUser.getFirstName())
                 .lastName(createdUser.getLastName())
                 .build();
-        // create user in microservices that needs
+        // publish userCreatedEvent in microservices that needs
         kafkaTemplate.send("userCreatedTopic", userCreatedEvent);
+
+        ProfileCreatedEvent profileCreatedEvent = ProfileCreatedEvent.builder()
+                .id(defaultProfile.getId())
+                .userId(defaultProfile.getUser().getId())
+                .userUuid(defaultProfile.getUser().getUuid())
+                .build();
+        // publish userCreatedEvent in microservices that needs
+        kafkaTemplate.send("profileCreatedTopic", profileCreatedEvent);
 
         // notify user
         notifyUser(createdUser);

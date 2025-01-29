@@ -30,7 +30,7 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
         spring.json.addtypeheaders: false
-        spring.json.type.mapping: userCreatedEvent:dz.kyrios.adminservice.event.user.UserCreatedEvent,event:dz.kyrios.adminservice.config.auditlog.EntityTrace,notificationEvent:dz.kyrios.adminservice.event.notification.NotificationPayload,notificationPlaceHolder:dz.kyrios.adminservice.event.notification.PlaceHolder
+        spring.json.type.mapping: profileCreatedEvent:dz.kyrios.adminservice.event.user.ProfileCreatedEvent,userCreatedEvent:dz.kyrios.adminservice.event.user.UserCreatedEvent,event:dz.kyrios.adminservice.config.auditlog.EntityTrace,notificationEvent:dz.kyrios.adminservice.event.notification.NotificationPayload,notificationPlaceHolder:dz.kyrios.adminservice.event.notification.PlaceHolder
   flyway:
     enabled: true
     url: jdbc:postgresql://localhost:5432/admin-db

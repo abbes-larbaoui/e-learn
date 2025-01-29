@@ -1,5 +1,7 @@
 package dz.kyrios.adminservice.service;
 
+import dz.kyrios.adminservice.dto.profile.ProfileResponse;
+import dz.kyrios.adminservice.dto.profile.ProfileResponseForCore;
 import dz.kyrios.adminservice.entity.Authority;
 import dz.kyrios.adminservice.entity.Module;
 import dz.kyrios.adminservice.entity.Profile;
@@ -62,5 +64,21 @@ public class PermissionService {
         } else {
             return false;
         }
+    }
+
+    public ProfileResponseForCore getUserActiveProfile() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        JwtAuthenticationToken jwtAuthentication = (JwtAuthenticationToken) authentication;
+        Jwt jwt = jwtAuthentication.getToken();
+
+        String username = (String) jwt.getClaims().get("preferred_username");
+
+        Profile profile = userService.getOneByUsername(username).getActifProfile();
+
+        return ProfileResponseForCore.builder()
+                .id(profile.getId())
+                .userId(profile.getUser().getId())
+                .userUuid(profile.getUser().getUuid())
+                .build();
     }
 }

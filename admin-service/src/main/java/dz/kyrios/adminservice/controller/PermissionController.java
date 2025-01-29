@@ -24,4 +24,13 @@ public class PermissionController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/api/v1/user/active/profile")
+    public ResponseEntity<Object> getUserActiveProfile() {
+        try {
+            return new ResponseEntity<>(permissionService.getUserActiveProfile(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

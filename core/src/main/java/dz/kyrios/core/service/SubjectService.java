@@ -10,6 +10,7 @@ import dz.kyrios.core.entity.Subject;
 import dz.kyrios.core.mapper.subject.SubjectMapper;
 import dz.kyrios.core.repository.FieldRepository;
 import dz.kyrios.core.repository.SubjectRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -61,6 +62,7 @@ public class SubjectService {
         return subjectMapper.entityToResponse(created);
     }
 
+    @Transactional
     public SubjectResponse update(SubjectRequest request, Long id) {
         Subject entity = subjectRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(id, "Subject not found with id: "));

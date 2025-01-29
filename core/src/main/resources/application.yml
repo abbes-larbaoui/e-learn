@@ -14,6 +14,14 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: coreId
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.type.mapping: profileCreatedEvent:dz.kyrios.core.dto.profile.ProfileResponseFromAdminService
 server:
   port: 0
 eureka:
@@ -25,4 +33,5 @@ permission-service:
   uri: http://localhost:8080/admin-service/api/v1/permission
   authority-param-name: authority
   module-param-name: module
-  module-name: core-service
+  module-name: CORE_MODULE
+active-profile-uri: http://localhost:8080/admin-service/api/v1/user/active/profile

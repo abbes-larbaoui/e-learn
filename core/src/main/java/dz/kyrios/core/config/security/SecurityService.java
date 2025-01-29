@@ -16,31 +16,20 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Slf4j
-@Component("authz")
-public class AuthorizationLogic {
+@Component
+public class SecurityService {
 
-    @Value("${permission-service.uri}")
-    private String permissionServiceUri;
+    @Value("${active-profile-uri}")
+    private String activeProfileUri;
 
-    @Value("${permission-service.authority-param-name}")
-    private String authorityParamName;
-
-    @Value("${permission-service.module-param-name}")
-    private String moduleParamName;
-
-    @Value("${permission-service.module-name}")
-    private String moduleName;
-
-    public boolean hasCustomAuthority(String authority) {
+    public ProfileResponseFromAdminService getUserActiveProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
 
         if (authentication instanceof JwtAuthenticationToken jwtAuthentication) {
             Jwt jwt = jwtAuthentication.getToken();
 
-            String url = UriComponentsBuilder.fromUriString(permissionServiceUri)
-                    .queryParam(authorityParamName, authority)
-                    .queryParam(moduleParamName, moduleName)
+            String url = UriComponentsBuilder.fromUriString(activeProfileUri)
                     .build()
                     .toUriString();
 
@@ -54,13 +43,13 @@ public class AuthorizationLogic {
             // Send the request
             try {
                 RestTemplate restTemplate = new RestTemplate();
-                ResponseEntity<Boolean> response = restTemplate.exchange(url, HttpMethod.GET, entity, Boolean.class);
-                return Boolean.TRUE.equals(response.getBody());
+                ResponseEntity<ProfileResponseFromAdminService> response = restTemplate
+                        .exchange(url, HttpMethod.GET, entity, ProfileResponseFromAdminService.class);
+                return response.getBody();
             } catch (Exception e) {
                 log.error(e.getMessage());
             }
         }
-        return false;
+        return null;
     }
 }
-

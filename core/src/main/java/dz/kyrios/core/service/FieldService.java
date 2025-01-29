@@ -8,6 +8,7 @@ import dz.kyrios.core.dto.field.FieldResponse;
 import dz.kyrios.core.entity.Field;
 import dz.kyrios.core.mapper.field.FieldMapper;
 import dz.kyrios.core.repository.FieldRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -54,6 +55,7 @@ public class FieldService {
         return fieldMapper.entityToResponse(created);
     }
 
+    @Transactional
     public FieldResponse update(FieldRequest request, Long id) {
         Field entity = fieldRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(id, "Field not found with id: "));
