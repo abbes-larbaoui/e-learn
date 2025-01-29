@@ -1,9 +1,11 @@
 package dz.kyrios.core.mapper.teacher;
 
-import dz.kyrios.core.dto.teacher.TeacherRequest;
-import dz.kyrios.core.dto.teacher.TeacherResponse;
+import dz.kyrios.core.dto.teacher.*;
 import dz.kyrios.core.entity.Teacher;
+import dz.kyrios.core.entity.TeacherWorkingDay;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class TeacherMapperImp implements TeacherMapper {
@@ -27,5 +29,37 @@ public class TeacherMapperImp implements TeacherMapper {
                 teacher.getLastName(),
                 teacher.getBio(),
                 teacher.getStatus());
+    }
+
+    @Override
+    public TeacherResponseWithWorkingDay entityToResponseWithWorkingDay(Teacher teacher) {
+        List<TeacherWorkingDayResponse> workingDays = teacher
+                .getWorkingDays()
+                .stream()
+                .map(this::entityToResponse).toList();
+
+        return new TeacherResponseWithWorkingDay(teacher.getId(),
+                teacher.getFirstName(),
+                teacher.getLastName(),
+                teacher.getBio(),
+                workingDays,
+                teacher.getStatus());
+    }
+
+    @Override
+    public TeacherWorkingDay requestToEntity(TeacherWorkingDayRequest request) {
+        TeacherWorkingDay teacherWorkingDay = new TeacherWorkingDay();
+        teacherWorkingDay.setId(request.id());
+        teacherWorkingDay.setDayOfWeek(request.dayOfWeek());
+        teacherWorkingDay.setAvailableSlots(request.availableSlots());
+        return teacherWorkingDay;
+    }
+
+    @Override
+    public TeacherWorkingDayResponse entityToResponse(TeacherWorkingDay teacherWorkingDay) {
+        return new TeacherWorkingDayResponse(
+                teacherWorkingDay.getId(),
+                teacherWorkingDay.getDayOfWeek(),
+                teacherWorkingDay.getAvailableSlots());
     }
 }

@@ -4,6 +4,8 @@ import dz.kyrios.core.dto.subscriptionplan.SubscriptionPlanRequest;
 import dz.kyrios.core.dto.subscriptionplan.SubscriptionPlanResponse;
 import dz.kyrios.core.dto.teacher.TeacherRequest;
 import dz.kyrios.core.dto.teacher.TeacherResponse;
+import dz.kyrios.core.dto.teacher.TeacherResponseWithWorkingDay;
+import dz.kyrios.core.dto.teacher.TeacherWorkingDayRequest;
 import dz.kyrios.core.service.TeacherService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,11 +29,17 @@ public class TeacherController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PostMapping("/{teacher-id}/working-day")
+    @PostMapping("/working-day")
     @PreAuthorize("@authz.hasCustomAuthority('TEACHER_WORKING_DAY_ADD')")
-    public ResponseEntity<Object> addWorkingDayToTeacher(@PathVariable("teacher-id") String teacherId,
-                                                         @RequestBody TeacherRequest request) {
-        TeacherResponse response = teacherService.create(request);
+    public ResponseEntity<Object> addWorkingDayToTeacher(@RequestBody TeacherWorkingDayRequest request) {
+        TeacherResponseWithWorkingDay response = teacherService.addWorkingDayToTeacher(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/working-day/{working-day-id}")
+    @PreAuthorize("@authz.hasCustomAuthority('TEACHER_WORKING_DAY_REMOVE')")
+    public ResponseEntity<Object> removeWorkingDayFromTeacher(@PathVariable("working-day-id") Long workingDayId) {
+        TeacherResponseWithWorkingDay response = teacherService.removeWorkingDayFromTeacher(workingDayId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
