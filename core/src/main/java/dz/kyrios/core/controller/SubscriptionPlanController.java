@@ -66,4 +66,8 @@ public class SubscriptionPlanController {
         subscriptionPlanService.delete(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    // TODO: add publish Subscription Plan
+
+    // TODO: add disable Subscription Plan
 }

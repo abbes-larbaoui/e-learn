@@ -1,6 +1,6 @@
 package dz.kyrios.core.entity;
 
-import dz.kyrios.core.statics.GeneralStatus;
+import dz.kyrios.core.statics.SubscriptionStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -31,11 +31,16 @@ public class StudentSubscription {
     private SubscriptionPlan subscriptionPlan;
 
     @NotNull
-    @Column(name = "subscription_start_time", nullable = false)
+    @Column(name = "subscription_creation_time", nullable = false)
+    private LocalDateTime subscriptionCreationTime;
+
+    // TODO: add sessions schedule (day/hour)
+
+    @Column(name = "subscription_start_time")
     private LocalDateTime subscriptionStartTime;
 
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "status", columnDefinition = "VARCHAR(20) DEFAULT 'ACTIVE' NOT NULL")
-    private GeneralStatus status;
+    private SubscriptionStatus status;
 }

@@ -29,6 +29,11 @@ eureka:
     serviceUrl:
       defaultZone: http://eureka:password@localhost:8761/eureka
 
+stripe:
+  secret:
+    key: sk_test_51Im04PIaLwFdYOIIncHTdsLr6F5oPl23dhvl4EclkBihWAqcTWTSaHCmlhz6pl08dHziTNo4V7k4LK8tLjlDH3zS00MHlvUJvS
+    webhook: whsec_677fbbaad5d75c8bf90a4496736254784f1067e2ab11490fcf9e7e7f0dc272b9
+
 permission-service:
   uri: http://localhost:8080/admin-service/api/v1/permission
   authority-param-name: authority
