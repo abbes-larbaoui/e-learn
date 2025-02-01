@@ -2,10 +2,7 @@ package dz.kyrios.core.service;
 
 import dz.kyrios.core.config.exception.BadRequestException;
 import dz.kyrios.core.config.exception.NotFoundException;
-import dz.kyrios.core.entity.Payment;
-import dz.kyrios.core.entity.Student;
-import dz.kyrios.core.entity.StudentSubscription;
-import dz.kyrios.core.entity.SubscriptionPlan;
+import dz.kyrios.core.entity.*;
 import dz.kyrios.core.repository.PaymentRepository;
 import dz.kyrios.core.repository.StudentSubscriptionRepository;
 import dz.kyrios.core.repository.SubscriptionPlanRepository;
@@ -16,7 +13,12 @@ import dz.kyrios.core.statics.SubscriptionStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.OffsetTime;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class StudentSubscriptionService {
@@ -55,6 +57,9 @@ public class StudentSubscriptionService {
             throw new BadRequestException("Subscription plan is not published");
         }
 
+        /* check the sessions plan with teacher working days */
+
+
         /* get the connected student */
         Student student = studentService.getStudentFromCurrentProfile();
 
@@ -86,4 +91,36 @@ public class StudentSubscriptionService {
         paymentRepository.save(payment);
         studentSubscriptionRepository.save(studentSubscription);
     }
+
+//    public void validateSessionPlan(Teacher teacher, List<SessionPlan> sessionPlans) {
+//
+//        Map<DayOfWeek, List<AvailableSlot>> availableSchedule = teacher.getWorkingDays().stream()
+//                .collect(Collectors.toMap(
+//                        TeacherWorkingDay::getDayOfWeek,
+//                        TeacherWorkingDay::getAvailableSlots
+//                ));
+//
+//        // Validate each session plan
+//        for (SessionPlan sessionPlan : sessionPlans) {
+//            DayOfWeek sessionDay = sessionPlan.getSessionDay();
+//            OffsetTime sessionStartTime = sessionPlan.getSessionStartTime();
+//
+//            // Check if the session day exists in teacher's working days
+//            if (!availableSchedule.containsKey(sessionDay)) {
+//                throw new IllegalArgumentException("Teacher is not available on " + sessionDay);
+//            }
+//
+//            // Check if session start time fits within any available slot
+//            boolean isValidTime = availableSchedule.get(sessionDay).stream()
+//                    .anyMatch(slot -> isWithinSlot(sessionStartTime, slot));
+//
+//            if (!isValidTime) {
+//                throw new IllegalArgumentException("Invalid session time on " + sessionDay + " at " + sessionStartTime);
+//            }
+//        }
+//    }
+
+//    private boolean isWithinSlot(OffsetTime sessionTime, AvailableSlot slot) {
+//        return !sessionTime.isBefore(slot.getFrom()) && !sessionTime.isAfter(slot.getTo());
+//    }
 }

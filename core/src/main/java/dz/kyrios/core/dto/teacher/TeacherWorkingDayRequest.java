@@ -1,11 +1,9 @@
 package dz.kyrios.core.dto.teacher;
 
-import dz.kyrios.core.entity.AvailableSlot;
-
 import java.time.DayOfWeek;
-import java.util.List;
+import java.util.Set;
 
 public record TeacherWorkingDayRequest(Long id,
                                        DayOfWeek dayOfWeek,
-                                       List<AvailableSlot> availableSlots) {
+                                       Set<Long> sessionStartingTimeIds) {
 }

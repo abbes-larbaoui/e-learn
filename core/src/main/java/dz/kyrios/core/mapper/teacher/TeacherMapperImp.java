@@ -1,11 +1,13 @@
 package dz.kyrios.core.mapper.teacher;
 
 import dz.kyrios.core.dto.teacher.*;
+import dz.kyrios.core.entity.SessionStartingTime;
 import dz.kyrios.core.entity.Teacher;
 import dz.kyrios.core.entity.TeacherWorkingDay;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class TeacherMapperImp implements TeacherMapper {
@@ -51,7 +53,9 @@ public class TeacherMapperImp implements TeacherMapper {
         TeacherWorkingDay teacherWorkingDay = new TeacherWorkingDay();
         teacherWorkingDay.setId(request.id());
         teacherWorkingDay.setDayOfWeek(request.dayOfWeek());
-        teacherWorkingDay.setAvailableSlots(request.availableSlots());
+        teacherWorkingDay.setSessionStartingTimes(request.sessionStartingTimeIds()
+                .stream().map(SessionStartingTime::new).collect(Collectors.toSet()));
+
         return teacherWorkingDay;
     }
 
@@ -60,6 +64,6 @@ public class TeacherMapperImp implements TeacherMapper {
         return new TeacherWorkingDayResponse(
                 teacherWorkingDay.getId(),
                 teacherWorkingDay.getDayOfWeek(),
-                teacherWorkingDay.getAvailableSlots());
+                teacherWorkingDay.getSessionStartingTimes());
     }
 }

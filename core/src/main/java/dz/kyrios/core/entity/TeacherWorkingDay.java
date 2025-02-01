@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.DayOfWeek;
-import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -30,7 +30,10 @@ public class TeacherWorkingDay {
     @Column(name = "day_of_week", nullable = false)
     private DayOfWeek dayOfWeek;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "teacher_working_day_id", referencedColumnName = "id", nullable = false)
-    private List<AvailableSlot> availableSlots;
+//    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+//    @JoinColumn(name = "teacher_working_day_id", referencedColumnName = "id", nullable = false)
+//    private List<AvailableSlot> availableSlots;
+
+    @ManyToMany
+    private Set<SessionStartingTime> sessionStartingTimes;
 }

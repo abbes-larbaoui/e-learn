@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -34,7 +35,9 @@ public class StudentSubscription {
     @Column(name = "subscription_creation_time", nullable = false)
     private LocalDateTime subscriptionCreationTime;
 
-    // TODO: add sessions schedule (day/hour)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "student_subscription_id", referencedColumnName = "id", nullable = false)
+    private List<SessionPlan> sessionPlans;
 
     @Column(name = "subscription_start_time")
     private LocalDateTime subscriptionStartTime;
