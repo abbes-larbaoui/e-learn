@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.DayOfWeek;
-import java.time.OffsetTime;
 
 @Data
 @AllArgsConstructor
@@ -26,6 +25,7 @@ public class SessionPlan {
     private DayOfWeek sessionDay;
 
     @NotNull
-    @Column(name = "session_start_time", nullable = false)
-    private OffsetTime sessionStartTime;
+    @ManyToOne
+    @JoinColumn(name = "session_start_time_id", referencedColumnName = "id", nullable = false)
+    private SessionStartingTime startingTime;
 }

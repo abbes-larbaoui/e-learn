@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -37,7 +38,7 @@ public class StudentSubscription {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "student_subscription_id", referencedColumnName = "id", nullable = false)
-    private List<SessionPlan> sessionPlans;
+    private Set<SessionPlan> sessionPlans;
 
     @Column(name = "subscription_start_time")
     private LocalDateTime subscriptionStartTime;

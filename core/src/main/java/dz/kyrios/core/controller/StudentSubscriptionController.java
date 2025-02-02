@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/students/subscription")
@@ -22,8 +22,8 @@ public class StudentSubscriptionController {
     @PutMapping("/{subscription-plan-id}")
     @PreAuthorize("@authz.hasCustomAuthority('STUDENT_SUBSCRIBE')")
     public ResponseEntity<?> subscribe(@PathVariable("subscription-plan-id") Long subscribePlanId,
-                                       @RequestBody List<SessionPlan> sessionPlans) {
-        String paymentUri = studentSubscriptionService.subscribeStudentToPlan(subscribePlanId);
+                                       @RequestBody Set<SessionPlan> sessionPlans) {
+        String paymentUri = studentSubscriptionService.subscribeStudentToPlan(subscribePlanId, sessionPlans);
         return new ResponseEntity<>(paymentUri, HttpStatus.OK);
     }
 }
