@@ -1262,3 +1262,8 @@ This project implements a microservices architecture to create a scalable and ma
         3.  The business rules:
 
             1.  The template code must be unique.
+
+4.  <h3><u>Core :</u></h3>
+    1.  Config:
+        1. Stripe config:
+            run this command on cmd ``stripe listen --forward-to localhost:8080/core/webhooks/stripe``

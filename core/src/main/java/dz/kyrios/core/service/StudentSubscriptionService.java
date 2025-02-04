@@ -3,6 +3,7 @@ package dz.kyrios.core.service;
 import dz.kyrios.core.config.exception.BadRequestException;
 import dz.kyrios.core.config.exception.NotFoundException;
 import dz.kyrios.core.entity.*;
+import dz.kyrios.core.event.SubscriptionCreatedEvent;
 import dz.kyrios.core.repository.PaymentRepository;
 import dz.kyrios.core.repository.SessionStartingTimeRepository;
 import dz.kyrios.core.repository.StudentSubscriptionRepository;
@@ -12,12 +13,12 @@ import dz.kyrios.core.statics.PaymentStatus;
 import dz.kyrios.core.statics.SubscriptionPlanStatus;
 import dz.kyrios.core.statics.SubscriptionStatus;
 import jakarta.validation.ValidationException;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
 
@@ -30,19 +31,22 @@ public class StudentSubscriptionService {
     private final PaymentRepository paymentRepository;
     private final SessionStartingTimeRepository sessionStartingTimeRepository;
     private final StudentService studentService;
+    private final ApplicationEventPublisher eventPublisher;
 
     public StudentSubscriptionService(PaymentService paymentService,
                                       StudentSubscriptionRepository studentSubscriptionRepository,
                                       SubscriptionPlanRepository subscriptionPlanRepository,
                                       PaymentRepository paymentRepository,
                                       SessionStartingTimeRepository sessionStartingTimeRepository,
-                                      StudentService studentService) {
+                                      StudentService studentService,
+                                      ApplicationEventPublisher eventPublisher) {
         this.paymentService = paymentService;
         this.studentSubscriptionRepository = studentSubscriptionRepository;
         this.subscriptionPlanRepository = subscriptionPlanRepository;
         this.paymentRepository = paymentRepository;
         this.sessionStartingTimeRepository = sessionStartingTimeRepository;
         this.studentService = studentService;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -94,6 +98,9 @@ public class StudentSubscriptionService {
 
         paymentRepository.save(payment);
         studentSubscriptionRepository.save(studentSubscription);
+
+        // Publish the event asynchronously
+        eventPublisher.publishEvent(new SubscriptionCreatedEvent(studentSubscription.getId()));
     }
 
     private void validateSubscriptionRequest(SubscriptionPlan plan, Set<SessionPlan> sessionPlans) {
