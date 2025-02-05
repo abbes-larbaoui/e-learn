@@ -3,6 +3,7 @@ package dz.kyrios.core.entity;
 import dz.kyrios.core.statics.ScheduleStatus;
 import dz.kyrios.core.statics.SessionScheduleStatus;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,6 +35,10 @@ public class SessionSchedule {
     @NotNull
     @Column(name = "starting_time", nullable = false)
     private LocalTime startingTime;
+
+    @NotBlank
+    @Column(name = "meeting_url", nullable = false)
+    private String meetingUrl;
 
     @NotNull
     @Enumerated(EnumType.STRING)

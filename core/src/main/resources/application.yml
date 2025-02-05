@@ -34,6 +34,11 @@ stripe:
     key: sk_test_51Im04PIaLwFdYOIIncHTdsLr6F5oPl23dhvl4EclkBihWAqcTWTSaHCmlhz6pl08dHziTNo4V7k4LK8tLjlDH3zS00MHlvUJvS
     webhook: whsec_677fbbaad5d75c8bf90a4496736254784f1067e2ab11490fcf9e7e7f0dc272b9
 
+zoom:
+  client-id: f8RkkValR5CNn93atb7Ag
+  client-secret: v1xEVT2X872dA2bsoQcizv9zWi9oKswl
+  account-id: djYevRb2RiijbJ3VqGk76g
+
 permission-service:
   uri: http://localhost:8080/admin-service/api/v1/permission
   authority-param-name: authority

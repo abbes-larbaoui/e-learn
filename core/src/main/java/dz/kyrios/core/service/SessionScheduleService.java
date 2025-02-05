@@ -6,6 +6,7 @@ import dz.kyrios.core.entity.*;
 import dz.kyrios.core.mapper.sessionschedule.SessionScheduleMapper;
 import dz.kyrios.core.repository.SessionScheduleRepository;
 import dz.kyrios.core.repository.StudentSubscriptionRepository;
+import dz.kyrios.core.service.meeting.MeetingService;
 import dz.kyrios.core.statics.SessionScheduleStatus;
 import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +14,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 
 @Service
 public class SessionScheduleService {
@@ -25,6 +30,7 @@ public class SessionScheduleService {
     private final SessionScheduleRepository sessionScheduleRepository;
     private final TeacherService teacherService;
     private final StudentService studentService;
+    private final MeetingService meetingService;
     private final SessionScheduleMapper sessionScheduleMapper;
 
     @Autowired
@@ -32,11 +38,13 @@ public class SessionScheduleService {
                                   SessionScheduleRepository sessionScheduleRepository,
                                   TeacherService teacherService,
                                   StudentService studentService,
+                                  MeetingService meetingService,
                                   SessionScheduleMapper sessionScheduleMapper) {
         this.studentSubscriptionRepository = studentSubscriptionRepository;
         this.sessionScheduleRepository = sessionScheduleRepository;
         this.teacherService = teacherService;
         this.studentService = studentService;
+        this.meetingService = meetingService;
         this.sessionScheduleMapper = sessionScheduleMapper;
     }
 
@@ -68,6 +76,23 @@ public class SessionScheduleService {
                 session.setSessionDate(sessionDate);
                 session.setStartingTime(sessionPlan.getStartingTime().getStartingTime());
                 session.setStatus(SessionScheduleStatus.SCHEDULED);
+
+                // Merge LocalDate and LocalTime into LocalDateTime
+                LocalDateTime sessionDateTime = LocalDateTime.of(session.getSessionDate(), session.getStartingTime());
+
+                // Convert LocalDateTime to UTC formatted string
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                String utcTime = sessionDateTime.atZone(TimeZone.getDefault().toZoneId())
+                        .withZoneSameInstant(ZoneOffset.UTC)
+                        .toLocalDateTime()
+                        .format(formatter);
+                String topic = subscription.getSubscriptionPlan().getSubject().getName() + " by E-learning";
+
+                // Generate Zoom meeting link
+                String zoomMeetingUrl = meetingService.createMeeting(topic, utcTime, 60);
+
+                session.setMeetingUrl(zoomMeetingUrl);
+
 
                 sessions.add(session);
             }
