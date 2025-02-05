@@ -9,6 +9,7 @@ import dz.kyrios.core.repository.StudentSubscriptionRepository;
 import dz.kyrios.core.service.meeting.MeetingService;
 import dz.kyrios.core.statics.SessionScheduleStatus;
 import jakarta.validation.ValidationException;
+import jakarta.ws.rs.ForbiddenException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -117,5 +118,25 @@ public class SessionScheduleService {
 
         return sessionScheduleRepository.findByStudentSubscription_StudentAndSessionDateBetween(student, startDate, endDate)
                 .stream().map(sessionScheduleMapper::entityToResponse).toList();
+    }
+
+    public SessionScheduleResponse changeStatusSessionSchedule(Long sessionScheduleId, SessionScheduleStatus status) {
+        SessionSchedule sessionSchedule = sessionScheduleRepository.findById(sessionScheduleId)
+                .orElseThrow(() -> new NotFoundException(sessionScheduleId, "Session Schedule not found with id: "));
+
+        if (sessionSchedule.getStudentSubscription().getSubscriptionPlan().getTeacher() != teacherService.getTeacherFromCurrentProfile()) {
+            throw new ForbiddenException("You are not allowed to update this Session Schedule");
+        }
+
+        // Calculate session end time and check if the session has ended
+        LocalDateTime sessionEndTime = LocalDateTime.of(sessionSchedule.getSessionDate(), sessionSchedule.getStartingTime())
+                .plusHours(1);
+
+        if (LocalDateTime.now().isBefore(sessionEndTime)) {
+            throw new IllegalStateException("Session has not ended yet");
+        }
+
+        sessionSchedule.setStatus(status);
+        return sessionScheduleMapper.entityToResponse(sessionScheduleRepository.save(sessionSchedule));
     }
 }

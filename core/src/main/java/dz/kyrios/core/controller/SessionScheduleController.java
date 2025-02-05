@@ -1,13 +1,11 @@
 package dz.kyrios.core.controller;
 
 import dz.kyrios.core.dto.sessionschedule.SessionScheduleResponse;
-import dz.kyrios.core.entity.SessionSchedule;
 import dz.kyrios.core.service.SessionScheduleService;
+import dz.kyrios.core.statics.SessionScheduleStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -37,5 +35,35 @@ public class SessionScheduleController {
 
         List<SessionScheduleResponse> schedules = sessionScheduleService.getStudentScheduleForMonth(year, month);
         return ResponseEntity.ok(schedules);
+    }
+
+    @PutMapping("/complete/{session-schedule-id}")
+    @PreAuthorize("@authz.hasCustomAuthority('SESSION_SCHEDULE_COMPLETE')")
+    public ResponseEntity<SessionScheduleResponse> completeSessionSchedule(
+            @PathVariable("session-schedule-id") Long sessionScheduleId) {
+
+        SessionScheduleResponse response = sessionScheduleService
+                .changeStatusSessionSchedule(sessionScheduleId, SessionScheduleStatus.COMPLETED);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/cancel/{session-schedule-id}")
+    @PreAuthorize("@authz.hasCustomAuthority('SESSION_SCHEDULE_CANCEL')")
+    public ResponseEntity<SessionScheduleResponse> cancelSessionSchedule(
+            @PathVariable("session-schedule-id") Long sessionScheduleId) {
+
+        SessionScheduleResponse response = sessionScheduleService
+                .changeStatusSessionSchedule(sessionScheduleId, SessionScheduleStatus.CANCELED);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/miss/{session-schedule-id}")
+    @PreAuthorize("@authz.hasCustomAuthority('SESSION_SCHEDULE_MISS')")
+    public ResponseEntity<SessionScheduleResponse> missSessionSchedule(
+            @PathVariable("session-schedule-id") Long sessionScheduleId) {
+
+        SessionScheduleResponse response = sessionScheduleService
+                .changeStatusSessionSchedule(sessionScheduleId, SessionScheduleStatus.MISSED);
+        return ResponseEntity.ok(response);
     }
 }
