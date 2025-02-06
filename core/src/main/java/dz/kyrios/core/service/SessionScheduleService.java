@@ -19,10 +19,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TimeZone;
+import java.util.*;
 
 @Service
 public class SessionScheduleService {
@@ -135,8 +132,74 @@ public class SessionScheduleService {
         if (LocalDateTime.now().isBefore(sessionEndTime)) {
             throw new IllegalStateException("Session has not ended yet");
         }
-
         sessionSchedule.setStatus(status);
+
+        if (SessionScheduleStatus.CANCELED.equals(status)) {
+            createNewSessionAfterLast(sessionSchedule.getStudentSubscription());
+        }
+
         return sessionScheduleMapper.entityToResponse(sessionScheduleRepository.save(sessionSchedule));
+    }
+
+    public void createNewSessionAfterLast(StudentSubscription subscription) {
+
+        // Get last session for this subscription
+        Optional<SessionSchedule> lastSessionOpt = sessionScheduleRepository.findByStudentSubscription(subscription)
+                .stream()
+                .max(Comparator.comparing(session -> LocalDateTime.of(session.getSessionDate(), session.getStartingTime())));
+
+        if (lastSessionOpt.isEmpty()) {
+            throw new IllegalStateException("No valid sessions found for rescheduling.");
+        }
+
+        // Get session plans from student subscription
+        Set<SessionPlan> sessionPlans = subscription.getSessionPlans();
+
+        // Sort session plans by day of the week (Sunday → Monday → Wednesday)
+        List<SessionPlan> sortedPlans = sessionPlans.stream()
+                .sorted(Comparator.comparingInt(plan -> plan.getSessionDay().getValue()))
+                .toList();
+
+        // Find the next session plan after the last session date
+        SessionPlan nextSessionPlan = null;
+        for (SessionPlan plan : sortedPlans) {
+            if (plan.getSessionDay().getValue() > lastSessionOpt.get().getSessionDate().getDayOfWeek().getValue()) {
+                nextSessionPlan = plan;
+                break;
+            }
+        }
+
+        // If no next session was found, loop back to the first session of the next week
+        if (nextSessionPlan == null) {
+            nextSessionPlan = sortedPlans.get(0);
+        }
+
+        // Compute the next session date
+        LocalDate nextSessionDate = lastSessionOpt.get().getSessionDate().with(TemporalAdjusters.next(nextSessionPlan.getSessionDay()));
+
+        // Create the new session
+        SessionSchedule newSession = new SessionSchedule();
+        newSession.setStudentSubscription(subscription);
+        newSession.setSessionDate(nextSessionDate);
+        newSession.setStartingTime(nextSessionPlan.getStartingTime().getStartingTime());
+        newSession.setStatus(SessionScheduleStatus.RESCHEDULED);
+
+        // Merge LocalDate and LocalTime into LocalDateTime
+        LocalDateTime sessionDateTime = LocalDateTime.of(newSession.getSessionDate(), newSession.getStartingTime());
+
+        // Convert LocalDateTime to UTC formatted string
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        String utcTime = sessionDateTime.atZone(TimeZone.getDefault().toZoneId())
+                .withZoneSameInstant(ZoneOffset.UTC)
+                .toLocalDateTime()
+                .format(formatter);
+
+        String topic = subscription.getSubscriptionPlan().getSubject().getName() + " by E-learning";
+
+        // Generate Zoom meeting link
+        String zoomMeetingUrl = meetingService.createMeeting(topic, utcTime, 60);
+        newSession.setMeetingUrl(zoomMeetingUrl);
+
+        sessionScheduleRepository.save(newSession);
     }
 }

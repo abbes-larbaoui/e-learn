@@ -2,6 +2,7 @@ package dz.kyrios.core.repository;
 
 import dz.kyrios.core.entity.SessionSchedule;
 import dz.kyrios.core.entity.Student;
+import dz.kyrios.core.entity.StudentSubscription;
 import dz.kyrios.core.entity.Teacher;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -16,4 +17,6 @@ public interface SessionScheduleRepository extends JpaRepository<SessionSchedule
     List<SessionSchedule> findByStudentSubscription_SubscriptionPlan_TeacherAndSessionDateBetween(Teacher teacher, LocalDate startDate, LocalDate endDate);
 
     List<SessionSchedule> findByStudentSubscription_StudentAndSessionDateBetween(Student student, LocalDate startDate, LocalDate endDate);
+
+    List<SessionSchedule> findByStudentSubscription(StudentSubscription studentSubscription);
 }
