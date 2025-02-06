@@ -20,6 +20,7 @@ public class SessionScheduleController {
     }
 
     @GetMapping("/teacher/{year}/{month}")
+    @PreAuthorize("@authz.hasCustomAuthority('TEACHER_SCHEDULE_COMPLETE')")
     public ResponseEntity<List<SessionScheduleResponse>> getTeacherSchedule(
             @PathVariable int year,
             @PathVariable int month) {
@@ -29,6 +30,7 @@ public class SessionScheduleController {
     }
 
     @GetMapping("/student/{year}/{month}")
+    @PreAuthorize("@authz.hasCustomAuthority('STUDENT_SCHEDULE_COMPLETE')")
     public ResponseEntity<List<SessionScheduleResponse>> getStudentSchedule(
             @PathVariable int year,
             @PathVariable int month) {
