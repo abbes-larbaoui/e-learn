@@ -81,6 +81,20 @@ public class StudentSubscriptionService {
         return paymentService.createCheckoutSession(saved.getId(), "USD", subscriptionPlan.getPrice());
     }
 
+    public StudentSubscription getById(Long subscriptionId) {
+
+        return studentSubscriptionRepository.findById(subscriptionId)
+                .orElseThrow(() -> new NotFoundException(subscriptionId, "Subscription not found with id: "));
+    }
+
+    public void delete(Long subscriptionId) {
+        StudentSubscription studentSubscription = getById(subscriptionId);
+        if (!SubscriptionStatus.PENDING.equals(studentSubscription.getStatus())) {
+            throw new BadRequestException("You can not delete non pending subscription");
+        }
+        studentSubscriptionRepository.delete(studentSubscription);
+    }
+
     @Transactional
     public void updateSubscriptionStatus(Long subscriptionId, Payment payment) {
 
@@ -144,5 +158,10 @@ public class StudentSubscriptionService {
                         requestedDay + " is already booked by another student.");
             }
         }
+    }
+
+    public void expireStudentSubscription(StudentSubscription studentSubscription) {
+        studentSubscription.setStatus(SubscriptionStatus.EXPIRED);
+        studentSubscriptionRepository.save(studentSubscription);
     }
 }

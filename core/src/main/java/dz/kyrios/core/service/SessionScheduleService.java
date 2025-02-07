@@ -5,7 +5,6 @@ import dz.kyrios.core.dto.sessionschedule.SessionScheduleResponse;
 import dz.kyrios.core.entity.*;
 import dz.kyrios.core.mapper.sessionschedule.SessionScheduleMapper;
 import dz.kyrios.core.repository.SessionScheduleRepository;
-import dz.kyrios.core.repository.StudentSubscriptionRepository;
 import dz.kyrios.core.service.meeting.MeetingService;
 import dz.kyrios.core.statics.SessionScheduleStatus;
 import jakarta.validation.ValidationException;
@@ -24,22 +23,22 @@ import java.util.*;
 @Service
 public class SessionScheduleService {
 
-    private final StudentSubscriptionRepository studentSubscriptionRepository;
     private final SessionScheduleRepository sessionScheduleRepository;
+    private final StudentSubscriptionService studentSubscriptionService;
     private final TeacherService teacherService;
     private final StudentService studentService;
     private final MeetingService meetingService;
     private final SessionScheduleMapper sessionScheduleMapper;
 
     @Autowired
-    public SessionScheduleService(StudentSubscriptionRepository studentSubscriptionRepository,
-                                  SessionScheduleRepository sessionScheduleRepository,
+    public SessionScheduleService(SessionScheduleRepository sessionScheduleRepository,
+                                  StudentSubscriptionService studentSubscriptionService,
                                   TeacherService teacherService,
                                   StudentService studentService,
                                   MeetingService meetingService,
                                   SessionScheduleMapper sessionScheduleMapper) {
-        this.studentSubscriptionRepository = studentSubscriptionRepository;
         this.sessionScheduleRepository = sessionScheduleRepository;
+        this.studentSubscriptionService = studentSubscriptionService;
         this.teacherService = teacherService;
         this.studentService = studentService;
         this.meetingService = meetingService;
@@ -48,8 +47,7 @@ public class SessionScheduleService {
 
     @Transactional
     public void createSessionsForSubscription(Long subscriptionId) {
-        StudentSubscription subscription = studentSubscriptionRepository.findById(subscriptionId)
-                .orElseThrow(() -> new NotFoundException(subscriptionId, "Subscription not found with id: "));
+        StudentSubscription subscription = studentSubscriptionService.getById(subscriptionId);
 
         SubscriptionPlan plan = subscription.getSubscriptionPlan();
 
@@ -141,14 +139,88 @@ public class SessionScheduleService {
         return sessionScheduleMapper.entityToResponse(sessionScheduleRepository.save(sessionSchedule));
     }
 
+    public SessionScheduleResponse completeSessionSchedule(Long sessionScheduleId) {
+        SessionSchedule sessionSchedule = sessionScheduleRepository.findById(sessionScheduleId)
+                .orElseThrow(() -> new NotFoundException(sessionScheduleId, "Session Schedule not found with id: "));
+
+        if (sessionSchedule.getStudentSubscription().getSubscriptionPlan().getTeacher() != teacherService.getTeacherFromCurrentProfile()) {
+            throw new ForbiddenException("You are not allowed to update this Session Schedule");
+        }
+
+        // Calculate session end time and check if the session has ended
+        LocalDateTime sessionEndTime = LocalDateTime.of(sessionSchedule.getSessionDate(), sessionSchedule.getStartingTime())
+                .plusHours(1);
+
+        if (LocalDateTime.now().isBefore(sessionEndTime)) {
+            throw new IllegalStateException("Session has not ended yet");
+        }
+        sessionSchedule.setStatus(SessionScheduleStatus.COMPLETED);
+
+        if (Objects.equals(sessionSchedule.getId(), getLastSessionScheduleForSubscription(sessionSchedule.getStudentSubscription()).getId())) {
+            studentSubscriptionService.expireStudentSubscription(sessionSchedule.getStudentSubscription());
+        }
+
+        return sessionScheduleMapper.entityToResponse(sessionScheduleRepository.save(sessionSchedule));
+    }
+
+    public SessionScheduleResponse missSessionSchedule(Long sessionScheduleId) {
+        SessionSchedule sessionSchedule = sessionScheduleRepository.findById(sessionScheduleId)
+                .orElseThrow(() -> new NotFoundException(sessionScheduleId, "Session Schedule not found with id: "));
+
+        if (sessionSchedule.getStudentSubscription().getSubscriptionPlan().getTeacher() != teacherService.getTeacherFromCurrentProfile()) {
+            throw new ForbiddenException("You are not allowed to update this Session Schedule");
+        }
+
+        // Calculate session end time and check if the session has ended
+        LocalDateTime sessionEndTime = LocalDateTime.of(sessionSchedule.getSessionDate(), sessionSchedule.getStartingTime())
+                .plusHours(1);
+
+        if (LocalDateTime.now().isBefore(sessionEndTime)) {
+            throw new IllegalStateException("Session has not ended yet");
+        }
+        sessionSchedule.setStatus(SessionScheduleStatus.MISSED);
+        if (Objects.equals(sessionSchedule.getId(), getLastSessionScheduleForSubscription(sessionSchedule.getStudentSubscription()).getId())) {
+            studentSubscriptionService.expireStudentSubscription(sessionSchedule.getStudentSubscription());
+        }
+
+        return sessionScheduleMapper.entityToResponse(sessionScheduleRepository.save(sessionSchedule));
+    }
+
+    public SessionScheduleResponse cancelSessionSchedule(Long sessionScheduleId) {
+        SessionSchedule sessionSchedule = sessionScheduleRepository.findById(sessionScheduleId)
+                .orElseThrow(() -> new NotFoundException(sessionScheduleId, "Session Schedule not found with id: "));
+
+        if (sessionSchedule.getStudentSubscription().getSubscriptionPlan().getTeacher() != teacherService.getTeacherFromCurrentProfile()) {
+            throw new ForbiddenException("You are not allowed to update this Session Schedule");
+        }
+
+        // Calculate session end time and check if the session has ended
+        LocalDateTime sessionEndTime = LocalDateTime.of(sessionSchedule.getSessionDate(), sessionSchedule.getStartingTime())
+                .plusHours(1);
+
+        if (LocalDateTime.now().isBefore(sessionEndTime)) {
+            throw new IllegalStateException("Session has not ended yet");
+        }
+        sessionSchedule.setStatus(SessionScheduleStatus.CANCELED);
+        createNewSessionAfterLast(sessionSchedule.getStudentSubscription());
+
+        return sessionScheduleMapper.entityToResponse(sessionScheduleRepository.save(sessionSchedule));
+    }
+
+    public SessionSchedule getLastSessionScheduleForSubscription(StudentSubscription subscription) {
+        return sessionScheduleRepository.findByStudentSubscription(subscription)
+                .stream()
+                .max(Comparator
+                        .comparing(session -> LocalDateTime.of(session.getSessionDate(), session.getStartingTime())))
+                .orElseThrow(() -> new NotFoundException("Last session not found"));
+    }
+
     public void createNewSessionAfterLast(StudentSubscription subscription) {
 
         // Get last session for this subscription
-        Optional<SessionSchedule> lastSessionOpt = sessionScheduleRepository.findByStudentSubscription(subscription)
-                .stream()
-                .max(Comparator.comparing(session -> LocalDateTime.of(session.getSessionDate(), session.getStartingTime())));
+        SessionSchedule lastSessionOpt = getLastSessionScheduleForSubscription(subscription);
 
-        if (lastSessionOpt.isEmpty()) {
+        if (lastSessionOpt == null) {
             throw new IllegalStateException("No valid sessions found for rescheduling.");
         }
 
@@ -163,7 +235,7 @@ public class SessionScheduleService {
         // Find the next session plan after the last session date
         SessionPlan nextSessionPlan = null;
         for (SessionPlan plan : sortedPlans) {
-            if (plan.getSessionDay().getValue() > lastSessionOpt.get().getSessionDate().getDayOfWeek().getValue()) {
+            if (plan.getSessionDay().getValue() > lastSessionOpt.getSessionDate().getDayOfWeek().getValue()) {
                 nextSessionPlan = plan;
                 break;
             }
@@ -175,7 +247,7 @@ public class SessionScheduleService {
         }
 
         // Compute the next session date
-        LocalDate nextSessionDate = lastSessionOpt.get().getSessionDate().with(TemporalAdjusters.next(nextSessionPlan.getSessionDay()));
+        LocalDate nextSessionDate = lastSessionOpt.getSessionDate().with(TemporalAdjusters.next(nextSessionPlan.getSessionDay()));
 
         // Create the new session
         SessionSchedule newSession = new SessionSchedule();

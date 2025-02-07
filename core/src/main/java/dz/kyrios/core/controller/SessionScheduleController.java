@@ -45,7 +45,7 @@ public class SessionScheduleController {
             @PathVariable("session-schedule-id") Long sessionScheduleId) {
 
         SessionScheduleResponse response = sessionScheduleService
-                .changeStatusSessionSchedule(sessionScheduleId, SessionScheduleStatus.COMPLETED);
+                .completeSessionSchedule(sessionScheduleId);
         return ResponseEntity.ok(response);
     }
 
@@ -55,7 +55,7 @@ public class SessionScheduleController {
             @PathVariable("session-schedule-id") Long sessionScheduleId) {
 
         SessionScheduleResponse response = sessionScheduleService
-                .changeStatusSessionSchedule(sessionScheduleId, SessionScheduleStatus.CANCELED);
+                .cancelSessionSchedule(sessionScheduleId);
         return ResponseEntity.ok(response);
     }
 
@@ -65,7 +65,7 @@ public class SessionScheduleController {
             @PathVariable("session-schedule-id") Long sessionScheduleId) {
 
         SessionScheduleResponse response = sessionScheduleService
-                .changeStatusSessionSchedule(sessionScheduleId, SessionScheduleStatus.MISSED);
+                .missSessionSchedule(sessionScheduleId);
         return ResponseEntity.ok(response);
     }
 }

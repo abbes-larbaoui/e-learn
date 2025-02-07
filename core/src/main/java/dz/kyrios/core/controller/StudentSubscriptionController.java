@@ -26,4 +26,11 @@ public class StudentSubscriptionController {
         String paymentUri = studentSubscriptionService.subscribeStudentToPlan(subscribePlanId, sessionPlans);
         return new ResponseEntity<>(paymentUri, HttpStatus.OK);
     }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("@authz.hasCustomAuthority('STUDENT_SUBSCRIBTION_DELETE')")
+    public ResponseEntity<Object> delete(@PathVariable Long id) {
+        studentSubscriptionService.delete(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }
