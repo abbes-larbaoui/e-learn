@@ -110,4 +110,8 @@ public class SubscriptionPlanService {
         }
         subscriptionPlanRepository.delete(entity);
     }
+
+    public Long getTotalPlans() {
+        return subscriptionPlanRepository.count();
+    }
 }

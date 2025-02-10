@@ -39,4 +39,8 @@ public class StudentService {
 
         return studentMapper.entityToResponse(studentRepository.save(entity));
     }
+
+    public Long getTotalStudents() {
+        return studentRepository.count();
+    }
 }

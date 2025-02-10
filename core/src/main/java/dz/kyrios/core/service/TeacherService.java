@@ -84,4 +84,8 @@ public class TeacherService {
         }
     }
 
+    public Long getTotalTeachers() {
+        return teacherRepository.count();
+    }
+
 }
