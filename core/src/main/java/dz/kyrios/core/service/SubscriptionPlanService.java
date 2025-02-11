@@ -5,6 +5,7 @@ import dz.kyrios.core.config.exception.NotFoundException;
 import dz.kyrios.core.config.filter.clause.Clause;
 import dz.kyrios.core.config.filter.specification.GenericSpecification;
 import dz.kyrios.core.config.security.SecurityService;
+import dz.kyrios.core.dto.planssection.PlanResponse;
 import dz.kyrios.core.dto.subscriptionplan.SubscriptionPlanRequest;
 import dz.kyrios.core.dto.subscriptionplan.SubscriptionPlanResponse;
 import dz.kyrios.core.entity.Subject;
@@ -58,6 +59,20 @@ public class SubscriptionPlanService {
                 .map(subscriptionPlanMapper::entityToResponse)
                 .collect(Collectors.toList());
         return new PageImpl<>(subjectResponseList, pageRequest, page.getTotalElements());
+    }
+
+    public PageImpl<PlanResponse> getPublicPlans(PageRequest pageRequest, List<Clause> filter) {
+
+        Specification<SubscriptionPlan> specification = new GenericSpecification<>(filter);
+        List<PlanResponse> planResponseList;
+        Page<SubscriptionPlan> page;
+        page = subscriptionPlanRepository.findAll(specification, pageRequest);
+
+        planResponseList = page.getContent().stream()
+                .map(subscriptionPlanMapper::entityToPlanResponse)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(planResponseList, pageRequest, page.getTotalElements());
     }
 
 

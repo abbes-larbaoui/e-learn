@@ -1,6 +1,7 @@
 package dz.kyrios.core.mapper.subscriptionplan;
 
 import dz.kyrios.core.config.exception.NotFoundException;
+import dz.kyrios.core.dto.planssection.PlanResponse;
 import dz.kyrios.core.dto.subject.SubjectResponse;
 import dz.kyrios.core.dto.subscriptionplan.SubscriptionPlanRequest;
 import dz.kyrios.core.dto.subscriptionplan.SubscriptionPlanResponse;
@@ -55,5 +56,18 @@ public class SubscriptionPlanMapperImp implements SubscriptionPlanMapper {
                 subscriptionPlan.getSessionsPerWeek(),
                 subscriptionPlan.getPrice(),
                 subscriptionPlan.getStatus());
+    }
+
+    @Override
+    public PlanResponse entityToPlanResponse(SubscriptionPlan entity) {
+
+        return new PlanResponse(
+                entity.getId(),
+                entity.getSubject().getName(),
+                entity.getSubject().getField().getName(),
+                entity.getTeacher().getFirstName() + " " + entity.getTeacher().getLastName(),
+                entity.getMonths(),
+                entity.getSessionsPerWeek(),
+                entity.getPrice());
     }
 }
