@@ -25,7 +25,7 @@ public class FieldsSectionService {
 
     public FieldsSectionResponse getActiveFieldsSection() {
         FieldsSection entity = fieldsSectionRepository.findOneByActive(Boolean.TRUE)
-                .orElseThrow(() -> new NotFoundException("No active hero section found"));
+                .orElseThrow(() -> new NotFoundException("No active fields section found"));
         return fieldsSectionMapper.entityToResponse(entity);
     }
 }
