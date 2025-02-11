@@ -13,7 +13,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "fields_section_subject")
+@Table(name = "fields_section_field")
 public class FieldsSectionField {
 
     @Id
