@@ -6,6 +6,7 @@ import dz.kyrios.core.config.filter.enums.Operation;
 import dz.kyrios.core.config.filter.handlerMethodArgumentResolver.Critiria;
 import dz.kyrios.core.config.filter.handlerMethodArgumentResolver.SearchValue;
 import dz.kyrios.core.config.filter.handlerMethodArgumentResolver.SortParam;
+import dz.kyrios.core.dto.planssection.PlanResponse;
 import dz.kyrios.core.dto.subscriptionplan.SubscriptionPlanRequest;
 import dz.kyrios.core.dto.subscriptionplan.SubscriptionPlanResponse;
 import dz.kyrios.core.service.SubscriptionPlanService;
@@ -80,5 +81,11 @@ public class SubscriptionPlanController {
         filter.add(searchValue);
         filter.add(clause);
         return new ResponseEntity<>(subscriptionPlanService.getPublicPlans(pageRequest, filter), HttpStatus.OK);
+    }
+
+    @GetMapping("/api/v1/public/subscription-plans/{id}")
+    public ResponseEntity<Object> getPublicPlan(@PathVariable Long id) {
+        PlanResponse response = subscriptionPlanService.getPublicPlan(id);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

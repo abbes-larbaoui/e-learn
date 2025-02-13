@@ -82,6 +82,12 @@ public class SubscriptionPlanService {
         return subscriptionPlanMapper.entityToResponse(entity);
     }
 
+    public PlanResponse getPublicPlan(Long id) {
+        SubscriptionPlan entity = subscriptionPlanRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(id, "Subscription Plan not found with id: "));
+        return subscriptionPlanMapper.entityToPlanResponse(entity);
+    }
+
     public SubscriptionPlanResponse create(SubscriptionPlanRequest request) {
 
         Teacher teacher = teacherService.getTeacherFromCurrentProfile();
